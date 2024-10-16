@@ -1,9 +1,13 @@
+/* eslint-disable prettier/prettier */
 import { createStore } from "vuex";
+import task from "./modules/task";
+import user from "./modules/user";
 
-export default createStore({
-  state: {},
-  getters: {},
-  mutations: {},
-  actions: {},
-  modules: {},
+const store = createStore({
+  modules: {
+    task,
+    user,
+  },
 });
+
+export default store;
