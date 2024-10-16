@@ -1,7 +1,7 @@
 <!-- eslint-disable prettier/prettier -->
 <template lang="">
   <div>
-    <div class="navbar bg-base-100 shadow-md fixed">
+    <div class="navbar bg-white shadow-md fixed">
       <div class="flex-1">
         <a class="btn btn-ghost text-xl">Todo App</a>
       </div>

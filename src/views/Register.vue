@@ -5,9 +5,7 @@
         <h2 class="card-title text-2xl font-bold mb-6">Register</h2>
         <form @submit.prevent="register">
           <div class="form-control">
-            <label class="label">
-              <span class="label-text">Name</span>
-            </label>
+            <LabelComponent label="Name" />
             <label class="input input-bordered flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -22,20 +20,18 @@
                   d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
                 />
               </svg>
-              <input
+              <InputComponent
                 type="text"
                 class="grow"
                 v-model="user.name"
                 placeholder="your name"
                 autocomplete="new-name"
-                :rules="nameRules"
               />
             </label>
+            <ErrorMessage :name="errors.name" />
           </div>
           <div class="form-control mt-4">
-            <label class="label">
-              <span class="label-text">Username</span>
-            </label>
+            <LabelComponent label="Username" />
             <label class="input input-bordered flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -50,20 +46,18 @@
                   d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
                 />
               </svg>
-              <input
+              <InputComponent
                 type="text"
                 class="grow"
                 v-model="user.username"
                 placeholder="your username"
                 autocomplete="new-username"
-                :rules="usernameRules"
               />
             </label>
+            <ErrorMessage :name="errors.username" />
           </div>
           <div class="form-control mt-4">
-            <label class="label">
-              <span class="label-text">Password</span>
-            </label>
+            <LabelComponent label="Password" />
             <label class="input input-bordered flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -77,26 +71,19 @@
                   clip-rule="evenodd"
                 />
               </svg>
-              <input
+              <InputComponent
                 class="grow"
                 v-model="user.password"
                 :type="showPassword ? 'text' : 'password'"
                 placeholder="Enter password"
                 autocomplete="new-password"
-                :rules="passwordRules"
+                password
               />
-              <div v-if="showPassword" @click="handleClick">
-                <font-awesome-icon :icon="['fas', 'eye']" />
-              </div>
-              <div v-else @click="handleClick">
-                <font-awesome-icon :icon="['fas', 'eye-slash']" />
-              </div>
             </label>
+            <ErrorMessage :name="errors.password" />
           </div>
           <div class="form-control mt-4">
-            <label class="label">
-              <span class="label-text">Confirm Password</span>
-            </label>
+            <LabelComponent label="Confirm Password" />
             <label class="input input-bordered flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -110,21 +97,16 @@
                   clip-rule="evenodd"
                 />
               </svg>
-              <input
+              <InputComponent
                 class="grow"
                 v-model="user.confirmpassword"
-                :type="showConfirmPassword ? 'text' : 'password'"
-                placeholder="Enter confirm password"
+                :type="showPassword ? 'text' : 'password'"
+                placeholder="Enter password"
                 autocomplete="new-password"
-                :rules="confirmpasswordRules"
+                password
               />
-              <div v-if="showConfirmPassword" @click="handleClickConfirm">
-                <font-awesome-icon :icon="['fas', 'eye']" />
-              </div>
-              <div v-else @click="handleClickConfirm">
-                <font-awesome-icon :icon="['fas', 'eye-slash']" />
-              </div>
             </label>
+            <ErrorMessage :name="errors.confirmpassword" />
           </div>
           <div class="form-control mt-6">
             <button class="btn btn-primary" type="submit">Register</button>
@@ -140,71 +122,79 @@
   </body>
 </template>
 <script lang="ts">
-import { add } from "date-fns";
 import { defineComponent } from "vue";
 import { mapActions } from "vuex";
 import { mapGetters } from "vuex";
+import InputComponent from "@/components/InputComponent.vue";
+import LabelComponent from "@/components/LabelComponent.vue";
+import ErrorMessage from "@/components/ErrorMessage.vue";
 
 export default defineComponent({
   name: "LoginComponent",
+  components: {
+    InputComponent,
+    LabelComponent,
+    ErrorMessage,
+  },
 
   data() {
     return {
       showPassword: false,
-      showConfirmPassword: false,
       user: {
         name: "",
         username: "",
         password: "",
         confirmpassword: "",
       },
-
-      nameRules: [
-        (v: string) => !!v || "Name is required", // Memastikan tidak kosong
-        (v: string) => v.length >= 3 || "Name must be at least 3 characters", // Panjang minimal
-      ],
-
-      usernameRules: [
-        (v: string) => !!v || "Username is required",
-        (v: string) =>
-          v.length >= 3 || "Username must be at least 3 characters",
-        (v: string) =>
-          /^[a-zA-Z0-9_]+$/.test(v) ||
-          "Username can only contain letters, numbers, and underscores", // Hanya huruf, angka, underscore
-      ],
-
-      passwordRules: [
-        (v: string) => !!v || "Password is required",
-        (v: string) =>
-          v.length >= 6 || "Password must be at least 8 characters", // Panjang minimal
-      ],
-
-      confirmpasswordRules: [
-        (v: string) => !!v || "Confirm Password is required",
-        (v: string, password: string) =>
-          v === password || "Passwords do not match", // Harus cocok dengan password
-      ],
+      errors: {
+        name: "",
+        username: "",
+        password: "",
+        confirmpassword: "",
+      },
     };
   },
   methods: {
     ...mapActions({ addUser: "user/addUser" }),
     register() {
-      if (this.user) {
+      this.errors = {
+        name: "",
+        username: "",
+        password: "",
+        confirmpassword: "",
+      };
+
+      let valid = true;
+
+      if (!this.user.name || this.user.name.length < 3) {
+        this.errors.name = "Name must be at least 3 characters long";
+        valid = false;
+      }
+
+      if (!this.user.username || this.user.username.length < 3) {
+        this.errors.username = "Username must be at least 3 characters long";
+        valid = false;
+      }
+
+      if (!this.user.password || this.user.password.length < 6) {
+        this.errors.password = "Password must be at least 6 characters long";
+        valid = false;
+      }
+
+      if (this.user.confirmpassword !== this.user.password) {
+        this.errors.confirmpassword = "Passwords do not match";
+        valid = false;
+      }
+
+      if (valid) {
         const newUser = {
           name: this.user.name,
           username: this.user.username,
           password: this.user.password,
-          confirmpassword: this.user.confirmpassword,
         };
         this.addUser(newUser);
         this.$router.push("/login");
       }
-    },
-    handleClick() {
-      this.showPassword = !this.showPassword;
-    },
-    handleClickConfirm() {
-      this.showConfirmPassword = !this.showConfirmPassword;
     },
   },
   computed: {

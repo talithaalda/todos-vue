@@ -5,9 +5,7 @@
         <h2 class="card-title text-2xl font-bold mb-6">Login</h2>
         <form>
           <div class="form-control">
-            <label class="label">
-              <span class="label-text">Username</span>
-            </label>
+            <LabelComponent label="Username" />
             <label class="input input-bordered flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -23,19 +21,18 @@
                 />
               </svg>
 
-              <input
+              <InputComponent
                 type="text"
                 class="grow"
                 v-model="user.username"
-                placeholder="Your username"
+                placeholder="your username"
                 autocomplete="new-username"
               />
             </label>
+            <ErrorMessage :name="errors.username" />
           </div>
           <div class="form-control mt-4">
-            <label class="label">
-              <span class="label-text">Password</span>
-            </label>
+            <LabelComponent label="Password" />
             <label class="input input-bordered flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -49,21 +46,16 @@
                   clip-rule="evenodd"
                 />
               </svg>
-              <input
+              <InputComponent
                 class="grow"
                 v-model="user.password"
                 :type="showPassword ? 'text' : 'password'"
                 placeholder="Enter password"
                 autocomplete="new-password"
-                :rules="passwordRules"
+                password
               />
-              <div v-if="showPassword" @click="handleClick">
-                <font-awesome-icon :icon="['fas', 'eye']" />
-              </div>
-              <div v-else @click="handleClick">
-                <font-awesome-icon :icon="['fas', 'eye-slash']" />
-              </div>
             </label>
+            <ErrorMessage :name="errors.password" />
             <label class="label">
               <a href="#" class="label-text-alt link link-hover"
                 >Forgot password?</a
@@ -87,13 +79,25 @@
 import { defineComponent } from "vue";
 import { mapActions } from "vuex";
 import { mapGetters } from "vuex";
+import InputComponent from "@/components/InputComponent.vue";
+import LabelComponent from "@/components/LabelComponent.vue";
+import ErrorMessage from "@/components/ErrorMessage.vue";
 
 export default defineComponent({
   name: "LoginComponent",
+  components: {
+    InputComponent,
+    LabelComponent,
+    ErrorMessage,
+  },
   data() {
     return {
       showPassword: false,
       user: {
+        username: "",
+        password: "",
+      },
+      errors: {
         username: "",
         password: "",
       },
@@ -102,7 +106,30 @@ export default defineComponent({
   methods: {
     ...mapActions(["login"]),
     handleLogin() {
-      this.login(this.user);
+      this.errors = {
+        username: "",
+        password: "",
+      };
+      let valid = true;
+
+      if (!this.user.username) {
+        this.errors.username = "Username must fill";
+        valid = false;
+      }
+
+      if (!this.user.password) {
+        this.errors.password = "Password must fill";
+        valid = false;
+      }
+
+      if (valid) {
+        const newUser = {
+          username: this.user.username,
+          password: this.user.password,
+        };
+        this.login(newUser);
+        this.$router.push("/");
+      }
     },
     handleClick() {
       this.showPassword = !this.showPassword;
